@@ -1,7 +1,7 @@
 # SkyRig
 A series of bpy scripts to help with the process of creating Skyrim compatible animation rigs.
 
-These will work with any vanilla skeleton and modified skeletons such as XPMSE. It is assumed that the user has areasonable 
+These will work with any vanilla skeleton and modified skeletons such as XPMSE. It is assumed that the user has a reasonable 
 level of experience with Blender, and so the intricacies of armature objects such as bone parenting and rigify usage will
 not be discussed beyond what specific information relates to the scripts.
 
