@@ -1,6 +1,4 @@
 # SkyRig
-A series of bpy scripts to help with the process of creating Skyrim compatible animation rigs.
-
 These will work with any vanilla skeleton and modified skeletons such as XPMSE. It is assumed that the user has a reasonable 
 level of experience with Blender, and so the intricacies of armature objects such as bone parenting and rigify usage will
 not be discussed beyond what specific information relates to the scripts.
@@ -55,7 +53,8 @@ printed by all the scripts including warnings and constraint information can be 
    - Script 2 can be re-ran to regenerate the bone list, but only if the safeguard boolean _preventOverwrite is set to False
    - If you want to regenerate the name pair list or make subsequent adjustments to the bone names, make sure the skeleton is
    set to the default names first
-   - From this point you are free to manipulate the bone tails and roll/rotations to begin constructing a rigify meta-rig
+   - From this point you are free to add new control bones or manipulate the bone tails and roll/rotations to begin constructing 
+   a rigify meta-rig
 
    3_AttachEmpties
     
@@ -63,11 +62,10 @@ printed by all the scripts including warnings and constraint information can be 
    - The rigify object contains a set of bones which are duplicates of the meta-rig with the prefix 'DEF-'
    - The script will target these bones, along with 'root' and 'torso' and constrain a new empty object to each one
    - The empty objects will be added to a new collection named 'Rig Empties'
-   - DO NOT rename or rotate these empties manually, this will cause the bone constraining process to not work correctly
    - If the empties list needs regenerating, such as if the rig bones are rotated or their names are changed, delete the
    empties collection and re-run script 3
 
-   4_BoneConstraints
+   4_ConstrainBones
 
    - The fourth and final script is ran on the original, unmodified skeleton, which will be used to export the animation data
    - This script will retrieve the name pair list scene variable and use it to match the export skeleton bones to the empties
@@ -80,7 +78,7 @@ printed by all the scripts including warnings and constraint information can be 
 
    NifToolsToVanilla
 
-NifTools will automatically attempt to symmetrize the bones and vertx groups of anything it imports... and does a poor job of it.
+NifTools will automatically attempt to symmetrize the bones and vertex groups of anything it imports... and does a poor job of it.
 There is also no way to disable this process. This script will swap the target armature between the imported NifTools bone names
 and the vanilla bone names. If you are renaming bones, either manually or using my protocol, this is not necessary. This script
 is simply here as a utility for people who may need to use vanilla bone names. For example, to bridge the gap between NifTools

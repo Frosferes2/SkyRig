@@ -14,7 +14,14 @@ try:
 except KeyError:
     raise Exception('Name pairs object is missing, run bone name script on meta-rig')
     
+for _empty in _empties:
+    _empty.rotation_mode = 'QUATERNION'
+    _empty.rotation_quaternion[:] = (1.0, 0.0, 0.0, 0.0)
+    
+bpy.context.view_layer.update()
 bpy.ops.object.mode_set(mode='POSE')
+bpy.ops.pose.select_all(action='SELECT')
+bpy.ops.pose.constraints_clear()
 bpy.ops.pose.select_all(action='DESELECT')
 
 for _from, _to in _namePairs.items():
@@ -29,15 +36,10 @@ for _from, _to in _namePairs.items():
     pb = _skeleton.pose.bones[_from]
     print('Constraining bone {} to empty {}'.format(pb.name, _empty.name))
     _skeleton.data.bones.active = pb.bone
-    if 'Copy Transforms' not in pb.constraints:
-        bpy.ops.pose.constraint_add(type='COPY_TRANSFORMS')
-        
-    pb.constraints['Copy Transforms'].target = _empty
-    _empty.rotation_mode = 'QUATERNION'
-    if _empty.rotation_quaternion[:] != (1.0, 0.0, 0.0, 0.0):
-        print('WARNING: Empty {} already has a rotation applied. Ignoring'.format(_empty.name))
-        continue
-    
+    bpy.ops.pose.constraint_add(type='COPY_LOCATION')
+    pb.constraints['Copy Location'].target = _empty
+    bpy.ops.pose.constraint_add(type='COPY_ROTATION')
+    pb.constraints['Copy Rotation'].target = _empty
     _rotCache = _empty.matrix_world.to_quaternion()
     _empty.rotation_quaternion = pb.matrix.to_quaternion()
     _empty.rotation_quaternion.rotate(_rotCache.inverted())
