@@ -15,14 +15,14 @@ except KeyError:
     raise Exception('Name pairs object is missing, run bone name script on meta-rig')
     
 for _empty in _empties:
+    _empty.location[:] = (0.0, 0.0, 0.0)
     _empty.rotation_mode = 'QUATERNION'
     _empty.rotation_quaternion[:] = (1.0, 0.0, 0.0, 0.0)
     
-bpy.context.view_layer.update()
 bpy.ops.object.mode_set(mode='POSE')
-bpy.ops.pose.select_all(action='SELECT')
-bpy.ops.pose.constraints_clear()
 bpy.ops.pose.select_all(action='DESELECT')
+_skeleton.data.pose_position = 'REST'
+bpy.context.view_layer.update()
 
 for _from, _to in _namePairs.items():
     if _from in _empties.keys():
@@ -36,13 +36,29 @@ for _from, _to in _namePairs.items():
     pb = _skeleton.pose.bones[_from]
     print('Constraining bone {} to empty {}'.format(pb.name, _empty.name))
     _skeleton.data.bones.active = pb.bone
-    bpy.ops.pose.constraint_add(type='COPY_LOCATION')
-    pb.constraints['Copy Location'].target = _empty
-    bpy.ops.pose.constraint_add(type='COPY_ROTATION')
-    pb.constraints['Copy Rotation'].target = _empty
+    if 'RIG_POSITION' in pb.constraints:
+        _constraint = pb.constraints['RIG_POSITION']
+    else:
+        bpy.ops.pose.constraint_add(type='COPY_LOCATION')
+        _constraint = pb.constraints['Copy Location']
+        _constraint.name = 'RIG_POSITION'
+        
+    _constraint.target = _empty
+    
+    if 'RIG_ROTATION' in pb.constraints:
+        _constraint = pb.constraints['RIG_ROTATION']
+    else:
+        bpy.ops.pose.constraint_add(type='COPY_ROTATION')
+        _constraint = pb.constraints['Copy Rotation']
+        _constraint.name = 'RIG_ROTATION'
+        
+    _constraint.target = _empty
+    
+    _empty.location = pb.matrix.to_translation() - _empty.matrix_world.to_translation()
     _rotCache = _empty.matrix_world.to_quaternion()
     _empty.rotation_quaternion = pb.matrix.to_quaternion()
     _empty.rotation_quaternion.rotate(_rotCache.inverted())
     
 bpy.ops.pose.select_all(action='INVERT')
 bpy.ops.pose.hide()
+_skeleton.data.pose_position = 'POSE'

@@ -23,7 +23,7 @@ for key in _skeleton.data.bones.keys():
     _constraint = _empty.constraints['Copy Transforms']
     _constraint.target = _skeleton
     _constraint.subtarget = key
-    _constraint.mix_mode = 'BEFORE'
+    _constraint.mix_mode = 'BEFORE_SPLIT'
     if _empty.name in bpy.context.scene.collection.objects:
         bpy.context.scene.collection.objects.unlink(_empty)
     else:

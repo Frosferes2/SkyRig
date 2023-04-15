@@ -3,6 +3,12 @@ These will work with any vanilla skeleton and modified skeletons such as XPMSE. 
 level of experience with Blender, and so the intricacies of armature objects such as bone parenting and rigify usage will
 not be discussed beyond what specific information relates to the scripts.
 
+I am considering integrating these scripts into an interactive UI element to improve user friendliness, but I am unsure if SkyRig 
+will have enough users to justify the time investment. If this is something you would be interested in, please let me know. 
+Feedback on SkyRig is very much appreciated.
+
+   Background
+
 Skyrim's skeleton nodes are point-like, and thus preserve no information about bone tails and their connections.
 Additionally, the bone axis orientations are not consistent with Blender's standards. Because exported animations are very
 sensitive to deviations in bone orientations, it is not feasible to simply export animation data from a standard Blender 
@@ -67,14 +73,40 @@ printed by all the scripts including warnings and constraint information can be 
 
    4_ConstrainBones
 
-   - The fourth and final script is ran on the original, unmodified skeleton, which will be used to export the animation data
+   - The fourth script is ran on the original, unmodified skeleton, which will be used to export the animation data
    - This script will retrieve the name pair list scene variable and use it to match the export skeleton bones to the empties
-   - When a match is made, the skeleton bone is constrained to the empty, and a corrective rotation is applied to the empty
-   such that the orientation of the bone is conserved
+   - When a match is made, the skeleton bone is constrained to the empty, and an offset is applied to the position and rotation of the empty such that the transformations of the bone are preserved
    - Now any change in the animation rig's pose will be reflected in the export skeleton, provided both are in pose position
    - If your imported skinned meshes are targetting the skeleton, you should be able to see these move as well
    - The empty collection and the export skeleton can be safely hidden to improve visual clarity
    - Script 4 can be re-ran if the empties collection has been modified in some way
+
+The remaining scripts are either optional or relate to the propagation of imported animation and pose data to the animation rig. If you want to import animations, you must first create a new 'source' armature. This armature is a copy of the unmodified skeleton.nif onto which .kf data converted from .hkx via HKXCMD is imported.
+
+   5_SourceEmpties
+
+   - This script operates very similarly to script 3 and is ran on the source skeleton
+   - It uses the cached bone name variable to choose the appropriate bones to constrain a set of 'Source Empties' to
+
+   6_ConstrainToSource
+
+   - Similar to script 4 and is ran on the animation rig
+   - The script will automatically set all present rigify limbs to FK controls, which is needed for correct pose mapping
+   - The script then matches the rig bones to their appropriate source empties and corrects for positional and rotational offset
+   - The added constraints are given the name 'SOURCE_RETARGET', which will be needed later
+   - The animation rig will now follow the source skeleton as it animates, but is now unusable since constrained bones cannot be moved manually
+   - It is therefore necessary to bake the animation to the rig and remove the constraints to allow for free motion
+
+   7_BakeAnimation
+
+   - This is a simple utility script to select all rig pose bones with the SOURCE_RETARGET constraint
+   - With these bones selected, go to Pose > Animation > Bake Action
+   - In the menu that appears, set the frame range for the current animation
+   - Check the boxes: 'Only Selected Bones', 'Visual Keying' and 'Clear Constraints'
+   - Press OK, this operation may take a short while to complete
+   - Now the animation rig will have its own copy of the source key frame data, and can be moved around freely
+   - The animations are only applied to the FK controllers in the animation rig
+   - Rigify adds a UI button which allows the user to snap the rig IK to FK for all keyframes in the current action
 
    NifToolsToVanilla
 
