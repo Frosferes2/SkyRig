@@ -40,7 +40,7 @@ for _from, _to in _namePairs.items():
         _constraint = pb.constraints['RIG_POSITION']
     else:
         bpy.ops.pose.constraint_add(type='COPY_LOCATION')
-        _constraint = pb.constraints['Copy Location']
+        _constraint = pb.constraints[-1]
         _constraint.name = 'RIG_POSITION'
         
     _constraint.target = _empty
@@ -49,10 +49,20 @@ for _from, _to in _namePairs.items():
         _constraint = pb.constraints['RIG_ROTATION']
     else:
         bpy.ops.pose.constraint_add(type='COPY_ROTATION')
-        _constraint = pb.constraints['Copy Rotation']
+        _constraint = pb.constraints[-1]
         _constraint.name = 'RIG_ROTATION'
         
     _constraint.target = _empty
+    
+    if 'RIG_SCALE' in pb.constraints:
+        _constraint = pb.constraints['RIG_SCALE']
+    else:
+        bpy.ops.pose.constraint_add(type='COPY_SCALE')
+        _constraint = pb.constraints[-1]
+        _constraint.name = 'RIG_SCALE'
+        
+    _constraint.target = _empty
+    _constraint.use_make_uniform = True
     
     _empty.location = pb.matrix.to_translation() - _empty.matrix_world.to_translation()
     _rotCache = _empty.matrix_world.to_quaternion()
